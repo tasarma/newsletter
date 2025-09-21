@@ -17,5 +17,6 @@ async fn health_check_works() {
 }
 
 fn spawn_app() {
-    todo!()
+    let server = newsletter::run().expect("Failed to bind address");
+    let _ = tokio::spawn(server);
 }
