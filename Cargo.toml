@@ -28,6 +28,8 @@ chrono = "0.4.42"
 env_logger = "0.11.8"
 log = "0.4.28"
 tracing = { version = "0.1.41", features = ["log"] }
+tracing-subscriber = { version = "0.3.20", features = ["registry", "env-filter"] }
+tracing-bunyan-formatter = "0.3.10"
 
 [dev-dependencies]
 reqwest = "0.12.23"
