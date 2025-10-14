@@ -1,9 +1,19 @@
-use newsletter::configuration::{DatabaseSettings, get_configuration};
+use newsletter::configuration::{get_configuration, DatabaseSettings};
 use newsletter::startup::run;
 use newsletter::telemetry::{get_subscriber, init_subscriber};
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
+use std::sync::LazyLock;
 use uuid::Uuid;
+
+static TRACING: LazyLock<()> = LazyLock::new(|| {
+    // Ensure that the `tracing` stack is only initialised once using `once_cell`
+    let default_filter_level = "debug".to_string();
+    let subscriber_name = "test".to_string();
+
+    let subscriber = get_subscriber(subscriber_name, default_filter_level);
+    init_subscriber(subscriber);
+});
 
 pub struct TestApp {
     pub address: String,
@@ -11,10 +21,12 @@ pub struct TestApp {
 }
 
 async fn spawn_app() -> TestApp {
-    let subscriber = get_subscriber("test".into(), "debug".into());
-    init_subscriber(subscriber);
+    // The first time `initialize` is invoked the code in `TRACING` is executed.
+    // All other invocations will instead skip execution.
+    LazyLock::force(&TRACING);
 
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
+    // We retrieve the port assigned to us by the OS
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
