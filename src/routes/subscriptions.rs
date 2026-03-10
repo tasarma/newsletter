@@ -9,6 +9,7 @@ pub struct FormData {
     name: String,
 }
 
+#[allow(clippy::async_yields_async)]
 #[tracing::instrument(
     name = "Adding as a new subscriber",
     skip(form, pool),
