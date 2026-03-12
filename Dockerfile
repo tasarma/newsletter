@@ -11,6 +11,8 @@ FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 # Build our project dependencies, not our application!
 RUN cargo chef cook --release --recipe-path recipe.json
+# Up to this point, if our dependency tree stays the same,
+# all layers should be cached.
 COPY . .
 ENV SQLX_OFFLINE=true
 # Build our project
@@ -25,7 +27,6 @@ RUN apt-get update -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/target/release/newsletter newsletter
-COPY --from=builder /app/configuration.yaml configuration.yaml
 COPY configuration configuration
 ENV APP_ENVIRONMENT production
 ENTRYPOINT [ "./newsletter" ]
