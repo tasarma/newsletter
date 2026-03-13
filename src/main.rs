@@ -14,9 +14,8 @@ async fn main() -> std::io::Result<()> {
 
     let configuration = get_configuration().expect("Failed to read configuration.");
     // No longer async, given that we don't actually try to connect!
-    let connection_pool = PgPoolOptions::new()
-        .connect_lazy(&configuration.database.connection_string().expose_secret())
-        .expect("Failed to connect to Postgres.");
+    let connection_pool =
+        PgPoolOptions::new().connect_lazy_with(configuration.database.connect_options());
 
     // Here we choose to bind explicitly to localhost, 127.0.0.1, for security
     // reasons. This binding may cause issues in some environments. For example,
