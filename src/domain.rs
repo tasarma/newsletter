@@ -10,7 +10,7 @@ pub struct NewSubscriber {
 impl SubscriberName {
     /// Returns an instance of `SubscriberName` if the input satisfies all validation contrains
     /// on subscriber names. It panics otherwise.
-    pub fn parse(s: String) -> SubscriberName {
+    pub fn parse(s: String) -> Result<SubscriberName, String> {
         // `.trim()` returns a view over the input `s` without trailing
         // whitespace-like characters.
         // `.is_empty` checks if the view contains any character.
@@ -33,7 +33,7 @@ impl SubscriberName {
         if is_empty_or_whitespace || is_too_long || contain_forbidden_characters {
             panic!("{} is not a valid subscriber name.", s)
         } else {
-            Self(s)
+            Ok(Self(s))
         }
     }
 }
