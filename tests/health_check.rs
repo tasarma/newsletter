@@ -156,7 +156,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
 }
 
 #[tokio::test]
-async fn subscribe_returns_a_200_when_fields_are_present_but_invalid() {
+async fn subscribe_returns_a_400_when_fields_are_present_but_invalid() {
     // Arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -180,7 +180,7 @@ async fn subscribe_returns_a_200_when_fields_are_present_but_invalid() {
         assert_eq!(
             400,
             response.status().as_u16(),
-            "The API did not return 200 OK when the payload was {}",
+            "The API did not return 400 OK when the payload was {}",
             description
         );
     }
