@@ -1,3 +1,4 @@
+use newsletter::email_client::EmailClient;
 use secrecy::ExposeSecret;
 use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
@@ -17,6 +18,12 @@ async fn main() -> std::io::Result<()> {
     let connection_pool =
         PgPoolOptions::new().connect_lazy_with(configuration.database.connect_options());
 
+    let sender_email = configuration
+        .email_client
+        .sender()
+        .expect("Invalid sender email address");
+    let email_client = EmailClient::new(configuration.email_client.base_url, sender_email);
+
     // Here we choose to bind explicitly to localhost, 127.0.0.1, for security
     // reasons. This binding may cause issues in some environments. For example,
     // it causes connectivity issues running in WSL2, where you cannot reach the
@@ -28,6 +35,6 @@ async fn main() -> std::io::Result<()> {
         configuration.application.host, configuration.application.port
     );
     let listener = TcpListener::bind(address)?;
-    run(listener, connection_pool)?.await?;
+    run(listener, connection_pool, email_client)?.await?;
     Ok(())
 }
