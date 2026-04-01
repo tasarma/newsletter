@@ -1,4 +1,5 @@
 use reqwest::Client;
+use secrecy::{ExposeSecret, Secret};
 use serde::Serialize;
 
 use crate::domain::SubscriberEmail;
@@ -8,14 +9,20 @@ pub struct EmailClient {
     sender: SubscriberEmail,
     http_client: Client,
     base_url: String,
+    autherization_token: Secret<String>,
 }
 
 impl EmailClient {
-    pub fn new(base_url: String, sender: SubscriberEmail) -> Self {
+    pub fn new(
+        base_url: String,
+        sender: SubscriberEmail,
+        autherization_token: Secret<String>,
+    ) -> Self {
         Self {
             sender,
             http_client: Client::new(),
             base_url,
+            autherization_token,
         }
     }
 
@@ -34,7 +41,14 @@ impl EmailClient {
             text_body: text_content.to_owned(),
             html_body: html_content.to_owned(),
         };
-        let builder = self.http_client.post(url).json(&request_body);
+        let builder = self
+            .http_client
+            .post(&url)
+            .header(
+                "X-Postmark-Server-Token",
+                self.autherization_token.expose_secret(),
+            )
+            .json(&request_body);
         Ok(())
     }
 }
@@ -51,12 +65,13 @@ struct SendEmailRequest {
 #[cfg(test)]
 mod tests {
     use fake::{
-        Fake,
+        Fake, Faker,
         faker::{
             internet::ar_sa::SafeEmail,
             lorem::ar_sa::{Paragraph, Sentence},
         },
     };
+    use secrecy::Secret;
     use wiremock::{Mock, MockServer, ResponseTemplate, matchers::any};
 
     use crate::{domain::SubscriberEmail, email_client::EmailClient};
@@ -66,7 +81,7 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender);
+        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
 
         Mock::given(any())
             .respond_with(ResponseTemplate::new(200))
