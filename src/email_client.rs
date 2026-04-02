@@ -1,4 +1,4 @@
-use reqwest::Client;
+use reqwest::{Client, ClientBuilder};
 use secrecy::{ExposeSecret, Secret};
 use serde::Serialize;
 
@@ -18,9 +18,13 @@ impl EmailClient {
         sender: SubscriberEmail,
         autherization_token: Secret<String>,
     ) -> Self {
+        let http_client = Client::builder()
+            .timeout(std::time::Duration::from_secs(10))
+            .build()
+            .unwrap();
         Self {
             sender,
-            http_client: Client::new(),
+            http_client,
             base_url,
             autherization_token,
         }
