@@ -1,13 +1,10 @@
-use actix_web::cookie::time::error::Format;
-use newsletter::email_client::EmailClient;
 use secrecy::Secret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
-use std::net::TcpListener;
 use std::sync::LazyLock;
 use uuid::Uuid;
 
 use newsletter::configuration::{DatabaseSettings, get_configuration};
-use newsletter::startup::{Application, get_connection_pool, run};
+use newsletter::startup::{Application, get_connection_pool};
 use newsletter::telemetry::{get_subscriber, init_subscriber};
 
 static TRACING: LazyLock<()> = LazyLock::new(|| {
