@@ -1,0 +1,37 @@
+[book]
+title = "Zero to Production Notes"
+authors = ["tasarma"]
+description = "My learning notes and code snippets for Zero to Production in Rust."
+language = "en"
+src = "src"
+
+[output.html]
+# Enables a cleaner, modern default font setup
+default-theme = "light"
+preferred-dark-theme = "navy"
+# Adds a GitHub/GitLab icon in the top right to link to your repo
+git-repository-url = "https://github.com/tasarma/newsletter"
+
+[output.html.fold]
+# Essential for large books: allows you to collapse sidebar chapters
+enable = true
+level = 0     # 0 means chapters are folded by default
+
+[output.html.playground]
+# Crucial for Rust notes: makes code blocks much more powerful
+editable = false
+copyable = true     # Adds a "Copy" button to all code snippets
+copy-js = true
+line-numbers = true # Adds line numbers to your code blocks
+runnable = false    # Set to true only if you want a "Run" button (requires internet)
+
+[output.html.search]
+# Tweaks the built-in search for better technical queries
+enable = true
+limit-results = 20
+teaser-word-count = 30
+use-boolean-and = true # Requires all search terms to match (better for exact crate/function names)
+
+[build]
+build-dir = "book"
+create-missing = false # Prevents mdbook from creating empty files if you have a typo in SUMMARY.md
